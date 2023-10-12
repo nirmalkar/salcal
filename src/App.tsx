@@ -1,25 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { SalaryProvider } from "./context/SalaryContext";
+import { PPPProvider } from "./context/PPPContext";
+import SalaryAllocation from "./pages/SalaryAllocation";
+import PPPCalculator from "./pages/PPPCalculator";
+import "react-toastify/dist/ReactToastify.css";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <SalaryProvider>
+      <PPPProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<SalaryAllocation />} />
+            <Route path="/ppp-calculator" element={<PPPCalculator />} />
+          </Routes>
+        </BrowserRouter>
+      </PPPProvider>
+    </SalaryProvider>
   );
 }
 
