@@ -1,6 +1,5 @@
 import React from "react";
 import { useSalary } from "../context/SalaryContext";
-import PieChart from "./PieChart";
 
 const SalaryInputComponent: React.FC = () => {
   const { salaryValue, setSalaryValue } = useSalary();

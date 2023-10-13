@@ -33,7 +33,3 @@ export const rulesWithDetails: RulesWithDetails = {
 };
 
 export const rules = ["50-30-20-rule", "my-rule"];
-
-// Now you can access the data using the rules array
-const currentRule = "50-30-20-rule";
-const ruleDetails = rulesWithDetails[currentRule];

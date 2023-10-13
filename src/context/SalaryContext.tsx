@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import worldBankPPPData from "../constants/wbppp.json";
-import { type } from "os";
 
 type PppData = {
   LOCATION: string;

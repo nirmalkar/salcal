@@ -11,8 +11,8 @@ function App() {
       <PPPProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<SalaryAllocation />} />
-            <Route path="/ppp-calculator" element={<PPPCalculator />} />
+            <Route path="/" element={<PPPCalculator />} />
+            <Route path="/salary-breakdown" element={<SalaryAllocation />} />
           </Routes>
         </BrowserRouter>
       </PPPProvider>
