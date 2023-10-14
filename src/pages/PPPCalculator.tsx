@@ -11,13 +11,14 @@ import styled from "@emotion/styled";
 import Label from "../components/ReusableComponents/Label";
 import NumbnerInput from "../components/ReusableComponents/NumberInput";
 import Button from "../components/ReusableComponents/Button";
+import LineChart from "../components/ReusableComponents/Linechart";
 
 interface SourveAndTargetCountryObj {
   sourceCountriesObj: any;
   targetCountriesObj: any;
 }
 const SalaryAllocationContainer = styled.div`
-  width: 70%;
+  width: 80%;
   display: flex;
   justify-content: center;
   margin: 0 auto;
@@ -31,6 +32,7 @@ const SalaryAllocationContainer = styled.div`
     width: 100%;
   }
 `;
+
 const PPPCalculator: React.FC = () => {
   const [sourceCountry, setSourceCountry] = useState<string>("");
   const [salary, setSalary] = useState<number>(1000);
@@ -44,11 +46,18 @@ const PPPCalculator: React.FC = () => {
   const [sourceAvgPPPValue, setSourceAvgPPPValue] = useState<number>(0);
   const [targetAvgPPPValue, setTargetAvgPPPValue] = useState<number>(0);
   const [conversionRate, setConversionRate] = useState<number>(0);
+  const [sourceCountryChartData, setSourceCountryChartData] = useState<any>([]);
+  const [targetCountryChartData, setTargetCountryChartData] = useState<any>([]);
+  const [chartData, setChartdata] = useState<any>([]);
+  const [calculated, setCalculated] = useState<boolean>(false);
   const { worldBankPPPData } = usePPP();
 
   const calculatePPP = () => {
     const convertedSalary = salary * conversionRate;
     setOutput(convertedSalary);
+    if (sourceCountryChartData[0]?.id && targetCountryChartData[0]?.id) {
+      setCalculated(true);
+    }
   };
   useEffect(() => {
     setConversionRate(targetAvgPPPValue / sourceAvgPPPValue);
@@ -57,9 +66,19 @@ const PPPCalculator: React.FC = () => {
     const sourceCountriesData = worldBankPPPData.filter(
       (data) => data.LOCATION === sourceCountry
     );
+    setTargetCountry("");
+    setCalculated(false);
     const sourceCountriesObj = countries.filter(
       (country) => country.code === sourceCountry
     );
+
+    const sourceChartData = sourceCountriesData.map((ele) => ({
+      x: ele.TIME,
+      y: ele.Value,
+    }));
+    setSourceCountryChartData([
+      { id: sourceCountriesObj[0]?.name, data: sourceChartData },
+    ]);
     setSourceAndTargetCountryObj({
       ...sourceAndTargetCountryObj,
       sourceCountriesObj,
@@ -79,6 +98,13 @@ const PPPCalculator: React.FC = () => {
     const targetCountriesObj = countries.filter(
       (country) => country.code === targetCountry
     );
+    const targetChartData = targetCountriesData.map((ele) => ({
+      x: ele.TIME,
+      y: ele.Value,
+    }));
+    setTargetCountryChartData([
+      { id: targetCountriesObj[0]?.name, data: targetChartData },
+    ]);
     setSourceAndTargetCountryObj({
       ...sourceAndTargetCountryObj,
       targetCountriesObj,
@@ -90,14 +116,22 @@ const PPPCalculator: React.FC = () => {
     setTargetAvgPPPValue(
       targetCountriesAvgPPPValue / targetCountriesData.length
     );
+    if (sourceCountry) {
+      setCalculated(false);
+    }
   }, [targetCountry]);
-
+  console.log(sourceCountryChartData, targetCountryChartData);
+  useEffect(() => {
+    if (sourceCountryChartData[0]?.id && targetCountryChartData[0]?.id) {
+      setChartdata([...sourceCountryChartData, ...targetCountryChartData]);
+    }
+  }, [sourceCountryChartData, targetCountryChartData]);
   return (
     <Layout>
       <>
         <Navigation />
         <SalaryAllocationContainer>
-          <Card width="80%">
+          <Card width="100%">
             <>
               <CountrySelect
                 label="Source Country"
@@ -106,7 +140,11 @@ const PPPCalculator: React.FC = () => {
                 onChange={setSourceCountry}
               />
               <Label>
-                Salary in {sourceCountry}'s Local Currency{" "}
+                Salary in{" "}
+                <strong>
+                  {sourceAndTargetCountryObj["sourceCountriesObj"][0]?.name}'s{" "}
+                </strong>
+                Local Currency{" "}
                 {
                   sourceAndTargetCountryObj["sourceCountriesObj"][0]
                     ?.currencySymbol
@@ -123,19 +161,28 @@ const PPPCalculator: React.FC = () => {
                 onChange={setTargetCountry}
               />
               <Button onClick={calculatePPP}>Calculate</Button>
-              <div>
-                <strong>
-                  You need to earn:{" "}
-                  {
-                    sourceAndTargetCountryObj["targetCountriesObj"][0]
-                      ?.currencySymbol
-                  }
-                </strong>{" "}
-                {output.toFixed(2)} to live same kinda life in{" "}
-                <strong>
-                  {sourceAndTargetCountryObj["targetCountriesObj"][0]?.name}
-                </strong>
-              </div>
+              {calculated && (
+                <div>
+                  <strong>
+                    You need to earn:{" "}
+                    {
+                      sourceAndTargetCountryObj["targetCountriesObj"][0]
+                        ?.currencySymbol
+                    }
+                  </strong>{" "}
+                  {output.toFixed(2)} to live same kinda life in{" "}
+                  <strong>
+                    {sourceAndTargetCountryObj["targetCountriesObj"][0]?.name}
+                  </strong>
+                </div>
+              )}
+              {calculated && (
+                <LineChart
+                  legendX={"PPP value"}
+                  legendY={"Years"}
+                  data={chartData}
+                />
+              )}
             </>
           </Card>
         </SalaryAllocationContainer>

@@ -35,9 +35,15 @@ interface CardProps {
   width?: string;
 }
 
-const Card: React.FC<CardProps> = ({ children, title, content, height }) => {
+const Card: React.FC<CardProps> = ({
+  children,
+  title,
+  content,
+  height,
+  width,
+}) => {
   return (
-    <CardContainer height={height}>
+    <CardContainer width={width}>
       <CardTitle>{title}</CardTitle>
       <CardContent>{content}</CardContent>
       {children}
